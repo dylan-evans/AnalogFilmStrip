@@ -8,6 +8,24 @@ static AppTimer *timer;
 #define SCROLL_INC 2
 
 
+static void checker_area(GContext *ctx, GRect area, uint8_t hour,
+     uint8_t minute, GColor col1, GColor col2)
+{
+    bool toggle = 0;
+    for(int x = area.origin.x; x < (area.origin.x + area.size.w); x++) {
+        for(int y = area.origin.y; y < (area.origin.y + area.size.w); y++) {
+            if((toggle && (x & 1)) || (!toggle && !(x & 1))) {
+                graphics_context_set_stroke_color(ctx, col1);
+            } else {
+                graphics_context_set_stroke_color(ctx, col2);
+            }
+            graphics_draw_pixel(ctx, GPoint(x, y));
+            toggle = !toggle;
+        }
+    }
+}
+
+
 static void film1_update(Layer *layer, GContext *ctx)
 {
     static int sprocket_pos = 5;
@@ -30,7 +48,8 @@ static void film1_update(Layer *layer, GContext *ctx)
     graphics_context_set_fill_color(ctx, GColorBulgarianRose);
 
     graphics_fill_rect(ctx, GRect(18, -256 + frame_pos, 108, 128), 4, GCornersAll);
-    graphics_fill_rect(ctx, GRect(18, -113 + frame_pos, 108, 128), 4, GCornersAll);
+    //graphics_fill_rect(ctx, GRect(18, -113 + frame_pos, 108, 128), 4, GCornersAll);
+    checker_area(ctx, GRect(18, -113 + frame_pos, 108, 128), 1, 2, GColorBlack, GColorBulgarianRose);
     graphics_fill_rect(ctx, GRect(18, 30 + frame_pos, 108, 128), 4, GCornersAll);
 
     frame_pos += SCROLL_INC;
@@ -79,14 +98,14 @@ static void init(void)
 }
 
 static void deinit(void) {
-  window_destroy(window);
+    window_destroy(window);
 }
 
 int main(void) {
-  init();
+    init();
 
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Done initializing, pushed window: %p", window);
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Done initializing, pushed window: %p", window);
 
-  app_event_loop();
-  deinit();
+    app_event_loop();
+    deinit();
 }
